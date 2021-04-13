@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Note from './components/Note'
 
-import axios from 'axios'
 import noteService from './services/notes'
 
 const App = () => {
@@ -48,7 +47,7 @@ const App = () => {
 
   const toggleImportanceOf = id => {
     const note = notes.find(n => n.id === id)
-    const changeNote = { ...note, important: !note.important}
+    const changeNote = { ...note, important: !note.important }
 
     noteService
       .update(id, changeNote)
