@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
+
 import personService from './services/person'
+
 
 const App = () => {
   const [ persons, setPersons ] = useState([])
@@ -10,6 +13,9 @@ const App = () => {
   const [ newNumber, setNewNumber ] = useState('')
   const [ filterWord, setfilterWord ] = useState('')
   const [ filterPersons, setfilterPersons ] = useState(persons)
+  
+  const [ notificationMsg, setNotification ] = useState(null)
+  const [ notificationType, setNotificationType ] = useState(null)
 
   // get data from from server and set phonebook
   useEffect(() => {
@@ -48,6 +54,8 @@ const App = () => {
           .update(id, changeObject)
           .then(returnedObject =>{
             setPersons(persons.map(person => person.id !== id ? person: returnedObject))
+            setNewName('')
+            setNewNumber('')
           })
       }
 
@@ -58,6 +66,12 @@ const App = () => {
           setPersons(persons.concat(returnedObject))
           setNewName('')
           setNewNumber('')
+          setNotification(`Added ${newName}`)
+          setNotificationType('Add')
+          setTimeout(() => {
+            setNotification(null)
+            setNotificationType(null)
+          }, 5000)
         })
     }
   }
@@ -69,13 +83,21 @@ const App = () => {
       personService
         .deletePerson(id)
         .then(setPersons(filterObjects))
+        .catch(error => {
+          setNotification(`Information of ${name} has already been removed from server`)
+          setNotificationType('Error')
+          setTimeout(() => {
+            setNotification(null)
+            setNotificationType(null)
+          }, 5000)
+        })
     }
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <Notification message={notificationMsg} type={notificationType}/>
       <Filter filterWord={filterWord} handleFilterChange={handleFilterChange}/>
 
       <h2>Add a new</h2>
